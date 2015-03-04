@@ -1,6 +1,6 @@
 #!/bin/bash
 
-g++ -c -std=c++0x hellogl.cpp
+g++ -c -std=c++0x hellogl.cpp VectorVictor3.cpp
 
 exit 0
 

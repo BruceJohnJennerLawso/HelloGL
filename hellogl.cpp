@@ -7,15 +7,21 @@
 //#include "Source.cpp"
 
 #include <SFML/Window.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
+#include "VectorVictor3.hpp"
+
+#define cameraMove 6
+
 
 void Draw_cube(float size);
 void Draw_point(float x, float y, float z);
+void Draw_pyramid();
 
 int main()
 {
     // create the window
-    sf::Window window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
+    sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
     window.setVerticalSyncEnabled(true);
 
     // load resources, initialize the OpenGL states, ...
@@ -32,6 +38,11 @@ int main()
 	gluPerspective(90.0f, 1.0f, 1.0f, 500.0f);
 
 	float cubeSize = 20;
+
+	float cameraDistance = -200;
+
+	sf::RectangleShape rect(sf::Vector2f(1500, 50));
+	rect.setFillColor(sf::Color(0, 255, 0, 128));
 
 	sf::Clock clock;
     // run the main loop
@@ -58,10 +69,18 @@ int main()
 				// width/height ratio, the image ends up being distorted
             }
             if(event.type == sf::Event::KeyPressed)
-			{	if(event.key.code = sf::Keyboard::Space)
+			{	if(event.key.code = sf::Keyboard::Up)
 				{	cubeSize += 1;
 				}
+				if(event.key.code = sf::Keyboard::Down)
+				{	cubeSize -= 1;
+				}
 			}
+			if(event.type == sf::Event::MouseWheelMoved)
+			{	cameraDistance += event.mouseWheel.delta*cameraMove;
+			}
+			
+			
         }
 
         // clear the buffers
@@ -71,18 +90,35 @@ int main()
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
         // beats me...
-        glTranslatef(0.0f, 0.0f, -200.0f);
-		//glRotatef((clock.getElapsedTime().asSeconds()*50), 1.f, 0.f, 0.f);
+        glTranslatef(0.0f, 0.0f, cameraDistance);
+        // what the, why does it translate every frame
+		
+		// ohhh, so we can be 200 units back from wherever the 
+		
+		glRotatef(20*cos((clock.getElapsedTime().asSeconds()*0.5)), 1.f, 0.f, 0.f);
 		glRotatef((clock.getElapsedTime().asSeconds()*30), 0.f, 1.f, 0.f);
 		//glRotatef((clock.getElapsedTime().asSeconds()*90), 0.f, 0.f, 1.f);
 		// rotate the camera view a wee bit
 
 		// lets just try with the z axis rotate
 		// okay, no
+		
+		// that does not work
 
         // draw...
-		Draw_cube(cubeSize);
+		//Draw_cube(cubeSize);
+		Draw_pyramid();
 		Draw_point(25, 25, 25);
+		window.pushGLStates();
+
+		window.draw(rect);
+
+		window.popGLStates();
+		
+		int points = std::rand()%10 + 1;
+		for(int cy = 0; cy != points; ++cy)
+		{	Draw_point((20 + std::rand()%10),(20 + std::rand()%10),(20 + std::rand()%10));
+		}
 		// kewl
 
         // end the current frame (internally swaps the front and back buffers)
@@ -97,6 +133,11 @@ int main()
 void Draw_cube(float size)
 {	glBegin(GL_QUADS);
 
+	glColor3f(0,0,255);
+	// lancelots favourite cube
+	
+	// I dont care if the joke is old by now dammit!
+
 	glVertex3f(-size, -size, -size);
 	glVertex3f(-size,  size, -size);
 	glVertex3f( size,  size, -size);
@@ -105,36 +146,83 @@ void Draw_cube(float size)
 	// part...
 		
 	// and each set of four defines a face...
+
+	glColor3f(0,128,128);
+
 	glVertex3f(-size, -size, size);
 	glVertex3f(-size,  size, size);
 	glVertex3f( size,  size, size);
 	glVertex3f( size, -size, size);
+	
+	glColor3f(128,128,0);
 	
 	glVertex3f(-size, -size, -size);
 	glVertex3f(-size,  size, -size);
 	glVertex3f(-size,  size,  size);
 	glVertex3f(-size, -size,  size);
 
+	glColor3f(255,0,0);
+
 	glVertex3f(size, -size, -size);
 	glVertex3f(size,  size, -size);
 	glVertex3f(size,  size,  size);
 	glVertex3f(size, -size,  size);
+
+	glColor3f(128,0,128);
 
 	glVertex3f(-size, -size,  size);
 	glVertex3f(-size, -size, -size);
 	glVertex3f( size, -size, -size);
 	glVertex3f( size, -size,  size);
 
+	glColor3f(0,0,255);
+
 	glVertex3f(-size, size,  size);
 	glVertex3f(-size, size, -size);
 	glVertex3f( size, size, -size);
 	glVertex3f( size, size,  size);
+
+
 
 	glEnd();
 }
 
 void Draw_point(float x, float y, float z)
 {	glBegin(GL_POINTS);
+	glColor3f(255,0,0);
+	// aha, that works nicely
 	glVertex3f(x, y, z);
 	glEnd();
+}
+
+void Draw_pyramid()
+{
+	
+		glBegin(GL_TRIANGLES);								// Start Drawing A Triangle
+		glColor3f(10.0f,0.0f,0.0f);						// Red
+		glVertex3f( 0.0f, 10.0f, 0.0f);					// Top Of Triangle (Front)
+		glColor3f(0.0f,10.0f,0.0f);						// Green
+		glVertex3f(-10.0f,-10.0f, 10.0f);					// Left Of Triangle (Front)
+		glColor3f(0.0f,0.0f,10.0f);						// Blue
+		glVertex3f( 10.0f,-10.0f, 10.0f);					// Right Of Triangle (Front)
+		glColor3f(10.0f,0.0f,0.0f);						// Red
+		glVertex3f( 0.0f, 10.0f, 0.0f);					// Top Of Triangle (Right)
+		glColor3f(0.0f,0.0f,10.0f);						// Blue
+		glVertex3f( 10.0f,-10.0f, 10.0f);					// Left Of Triangle (Right)
+		glColor3f(0.0f,10.0f,0.0f);						// Green
+		glVertex3f( 10.0f,-10.0f, -10.0f);					// Right Of Triangle (Right)
+		glColor3f(10.0f,0.0f,0.0f);						// Red
+		glVertex3f( 0.0f, 10.0f, 0.0f);					// Top Of Triangle (Back)
+		glColor3f(0.0f,10.0f,0.0f);						// Green
+		glVertex3f( 10.0f,-10.0f, -10.0f);					// Left Of Triangle (Back)
+		glColor3f(0.0f,0.0f,10.0f);						// Blue
+		glVertex3f(-10.0f,-10.0f, -10.0f);					// Right Of Triangle (Back)
+		glColor3f(10.0f,0.0f,0.0f);						// Red
+		glVertex3f( 0.0f, 10.0f, 0.0f);					// Top Of Triangle (Left)
+		glColor3f(0.0f,0.0f,10.0f);						// Blue
+		glVertex3f(-10.0f,-10.0f,-10.0f);					// Left Of Triangle (Left)
+		glColor3f(0.0f,10.0f,0.0f);						// Green
+		glVertex3f(-10.0f,-10.0f, 10.0f);					// Right Of Triangle (Left)
+	glEnd();											// Done Drawing The Pyramid
+
 }
