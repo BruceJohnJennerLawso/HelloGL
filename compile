@@ -1,0 +1,10 @@
+#!/bin/bash
+
+g++ -c -std=c++0x hellogl.cpp
+
+exit 0
+
+#! 886 5404
+#! 886 5420
+#! domus
+#! value rental.ca

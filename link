@@ -1,0 +1,5 @@
+#!/bin/bash
+
+g++ hellogl.o -o hellogl -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+
+exit 0

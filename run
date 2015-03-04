@@ -1,0 +1,6 @@
+#!/bin/bash
+
+#!xterm './typewriter' -maximized
+./hellogl &
+
+exit 0
